@@ -30,6 +30,12 @@ export interface Config {
    * @default process.cwd()
    */
   root?: string
+
+  /**
+   * Files will be resolved against this path.
+   * @default process.cwd()
+   */
+  turbo?: boolean
 }
 
 export function normalizePaths (root: string, path: string | string[]): string[] {
@@ -47,14 +53,36 @@ export default (paths: string | string[], config: Config = {}): PluginOption => 
   // NOTE: Enable globbing so that Vite keeps track of the template files.
   config: () => ({ server: { watch: { disableGlobbing: false } } }),
 
+  transform(code, id, options) {
+    if ((options == null ? void 0 : options.ssr) && !process.env.VITEST)
+      return;
+
+    if (config.turbo && id.includes("hotwired_turbo-rails.js")) {
+      const metaHotFooter = `
+        if (import.meta.hot) {
+          import.meta.hot.on("turbo-refresh", (data) => {
+            console.log("Run <turbo-stream action=refresh> via vite-plugin-full-reload");
+            Turbo.renderStreamMessage('<turbo-stream action="refresh"></turbo-stream>');
+          })
+        }
+      `.replace(/(\n|\s\s)+/gm, "");
+
+      return `${code}\n${metaHotFooter}`;
+    }
+  },
+
   configureServer ({ watcher, ws, config: { logger } }: ViteDevServer) {
-    const { root = process.cwd(), log = true, always = true, delay = 0 } = config
+    const { root = process.cwd(), log = true, always = true, delay = 0, turbo = false } = config
 
     const files = normalizePaths(root, paths)
     const shouldReload = picomatch(files)
     const checkReload = (path: string) => {
       if (shouldReload(path)) {
-        setTimeout(() => ws.send({ type: 'full-reload', path: always ? '*' : path }), delay)
+        if (turbo) {
+          setTimeout(() => ws.send({ type: 'custom', event: 'turbo-refresh'}), delay)
+        } else {
+          setTimeout(() => ws.send({ type: 'full-reload', path: always ? '*' : path }), delay)
+        }
         if (log)
           logger.info(`${colors.green('full reload')} ${colors.dim(relative(root, path))}`, { clear: true, timestamp: true })
       }
