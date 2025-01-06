@@ -89,6 +89,17 @@ The following options can be provided:
   FullReload('app/views/**/*', { always: false })
   ``` 
 
+- <kbd>turbo</kbd>
+
+  Run Hotwired Turbo [page refreshes](https://turbo.hotwired.dev/handbook/page_refreshes#broadcasting-page-refreshes) (fast, because it only refreshes HTML), instead full reload page (slowly, because loaded CSS and JS any refresh)
+
+  __Default:__ `false`
+
+  ```js
+  FullReload('app/views/**/*', { turbo: true })
+  ``` 
+
+
 ## Acknowledgements
 
 - <kbd>[vite-plugin-live-reload]</kbd>
