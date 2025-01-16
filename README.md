@@ -18,12 +18,13 @@
 [vite-plugin-live-reload]: https://github.com/arnoson/vite-plugin-live-reload
 [Vite Ruby]: https://github.com/ElMassimo/vite_ruby
 [picomatch]: https://github.com/micromatch/picomatch#globbing-features
+[Hotwire Turbo]: https://turbo.hotwired.dev/
 
 ## Why? 🤔
 
 When using _[Vite Ruby]_, I wanted to see changes to server-rendered layouts and templates without having to manually reload the page.
 
-_[vite-plugin-turbo-reload]_ is a replacement for the _[vite-plugin-full-reload]_ plugin, offering smoother and faster DOM updates when using Hotwire Turbo.
+_[vite-plugin-turbo-reload]_ is a replacement for the _[vite-plugin-full-reload]_ plugin, offering smoother and faster DOM updates when using _[Hotwire Turbo]_.
 
 ## Installation 💿
 
@@ -51,6 +52,22 @@ export default defineConfig({
 This is useful to trigger a page refresh for files that are not being imported, such as server-rendered templates.
 
 To see which file globbing options are available, check [picomatch].
+
+## Limitation
+- work only with Turbo version 8.0+
+- if using plugin `vite-plugin-rails` you should set `fullReload: false`:
+```js
+import { defineConfig } from 'vite'
+import rails from "vite-plugin-rails"
+import TurboReload from 'vite-plugin-turbo-reload'
+
+export default defineConfig({
+  plugins: [
+    rails({ fullReload: false }),
+    TurboReload(['app/views/**/*', 'app/components/**/*']),
+  ],
+})
+```
 
 ## Configuration ⚙️
 
