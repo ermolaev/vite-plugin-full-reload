@@ -1,38 +1,36 @@
-<h2 align='center'><samp>vite-plugin-full-reload</samp></h2>
+<h2 align='center'><samp>vite-plugin-turbo-reload</samp></h2>
 
-<p align='center'>Automatically reload the page when files are modified</p>
+<p align='center'>Automatically reload the page via Hotwired Turbo when files are modified</p>
 
 <p align='center'>
-  <a href='https://www.npmjs.com/package/vite-plugin-full-reload'>
-    <img src='https://img.shields.io/npm/v/vite-plugin-full-reload?color=222&style=flat-square'>
+  <a href='https://www.npmjs.com/package/vite-plugin-turbo-reload'>
+    <img src='https://img.shields.io/npm/v/vite-plugin-turbo-reload?color=222&style=flat-square'>
   </a>
-  <a href='https://github.com/ElMassimo/vite-plugin-full-reload/blob/main/LICENSE.txt'>
+  <a href='https://github.com/ElMassimo/vite-plugin-turbo-reload/blob/main/LICENSE.txt'>
     <img src='https://img.shields.io/badge/license-MIT-blue.svg'>
   </a>
 </p>
 
 <br>
 
+[vite-plugin-turbo-reload]: https://github.com/ermolaev/vite-plugin-turbo-reload
 [vite-plugin-full-reload]: https://github.com/ElMassimo/vite-plugin-full-reload
 [vite-plugin-live-reload]: https://github.com/arnoson/vite-plugin-live-reload
 [Vite Ruby]: https://github.com/ElMassimo/vite_ruby
-[JS From Routes]: https://github.com/ElMassimo/js_from_routes
 [picomatch]: https://github.com/micromatch/picomatch#globbing-features
 
 ## Why? 🤔
 
 When using _[Vite Ruby]_, I wanted to see changes to server-rendered layouts and templates without having to manually reload the page.
 
-Also, in _[JS From Routes]_ path helpers are generated when Rails reload is triggered.
-
-Triggering a page reload when `config/routes.rb` is modified makes the DX very smooth.
+_[vite-plugin-turbo-reload]_ is a replacement for the _[vite-plugin-full-reload]_ plugin, offering smoother and faster DOM updates when using Hotwire Turbo.
 
 ## Installation 💿
 
 Install the package as a development dependency:
 
 ```bash
-npm i -D vite-plugin-full-reload # yarn add -D vite-plugin-full-reload
+npm i -D vite-plugin-turbo-reload # yarn add -D vite-plugin-turbo-reload
 ```
 
 ## Usage 🚀
@@ -41,11 +39,11 @@ Add it to your plugins in `vite.config.ts`
 
 ```ts
 import { defineConfig } from 'vite'
-import FullReload from 'vite-plugin-full-reload'
+import TurboReload from 'vite-plugin-turbo-reload'
 
 export default defineConfig({
   plugins: [
-    FullReload(['config/routes.rb', 'app/views/**/*'])
+    TurboReload(['config/routes.rb', 'app/views/**/*', 'app/components/**/*'])
   ],
 })
 ```
@@ -65,7 +63,7 @@ The following options can be provided:
   __Default:__ `process.cwd()`
 
   ``` js
-  FullReload('config/routes.rb', { root: __dirname }),
+  TurboReload('config/routes.rb', { root: __dirname }),
   ``` 
 
 - <kbd>delay</kbd>
@@ -76,39 +74,8 @@ The following options can be provided:
   __Default:__ `0`
   
   ```js
-  FullReload('app/views/**/*', { delay: 100 })
-  ``` 
-
-- <kbd>always</kbd>
-
-  Whether to refresh the page even if the modified HTML file is not currently being displayed.
-
-  __Default:__ `true`
-  
-  ```js
-  FullReload('app/views/**/*', { always: false })
-  ``` 
-
-- <kbd>turbo</kbd>
-
-  Run Hotwired Turbo [page refreshes](https://turbo.hotwired.dev/handbook/page_refreshes#broadcasting-page-refreshes) (fast, because it only refreshes HTML), instead full reload page (slowly, because loaded CSS and JS any refresh)
-
-  __Default:__ `false`
-
-  ```js
-  FullReload('app/views/**/*', { turbo: true })
-  ``` 
-
-
-## Acknowledgements
-
-- <kbd>[vite-plugin-live-reload]</kbd>
-
-  This is a nice plugin, I found it right before publishing this one.
-
-  I've made [two](https://github.com/arnoson/vite-plugin-live-reload/pull/3) [PRs](https://github.com/arnoson/vite-plugin-live-reload/pull/5) that were needed to support these use cases.
-
-  At this point in time they are very similar, except this library doesn't create another `chokidar` watcher.
+  TurboReload('app/views/**/*', { delay: 100 })
+  ```
 
 ## License
 

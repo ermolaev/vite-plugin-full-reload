@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-full-reload-example",
+  "name": "vite-plugin-turbo-reload-example",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
@@ -10,6 +10,6 @@
   "devDependencies": {
     "typescript": "^4",
     "vite": "^5",
-    "vite-plugin-full-reload": "workspace:*"
+    "vite-plugin-turbo-reload": "workspace:*"
   }
 }

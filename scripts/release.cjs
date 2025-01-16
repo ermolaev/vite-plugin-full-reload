@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 /**
  * modified from https://github.com/vuejs/vue-next/blob/master/scripts/release.js
  */
@@ -11,7 +9,7 @@ const semver = require('semver')
 const colors = require('picocolors')
 const { prompt } = require('enquirer')
 
-const name = 'vite-plugin-full-reload'
+const name = 'vite-plugin-turbo-reload'
 
 const isRubyLibrary = name !== 'vite-plugin-ruby'
 const pkg = jsPackage()

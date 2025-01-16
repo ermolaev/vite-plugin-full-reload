@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import reloadOnChange from 'vite-plugin-full-reload'
+import reloadOnChange from 'vite-plugin-turbo-reload'
 
 export default defineConfig({
   plugins: [
