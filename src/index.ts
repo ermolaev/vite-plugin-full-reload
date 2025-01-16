@@ -8,12 +8,6 @@ import { type PluginOption, type ViteDevServer, normalizePath } from 'vite'
  */
 export interface Config {
   /**
-   * Whether full reload should happen regardless of the file path.
-   * @default true
-   */
-  always?: boolean
-
-  /**
    * How many milliseconds to wait before reloading the page after a file change.
    * @default 0
    */
@@ -30,12 +24,6 @@ export interface Config {
    * @default process.cwd()
    */
   root?: string
-
-  /**
-   * Files will be resolved against this path.
-   * @default process.cwd()
-   */
-  turbo?: boolean
 }
 
 export function normalizePaths (root: string, path: string | string[]): string[] {
@@ -46,7 +34,7 @@ export function normalizePaths (root: string, path: string | string[]): string[]
  * Allows to automatically reload the page when a watched file changes.
  */
 export default (paths: string | string[], config: Config = {}): PluginOption => ({
-  name: 'vite-plugin-full-reload',
+  name: 'vite-plugin-turbo-reload',
 
   apply: 'serve',
 
@@ -57,11 +45,13 @@ export default (paths: string | string[], config: Config = {}): PluginOption => 
     if ((options == null ? void 0 : options.ssr) && !process.env.VITEST)
       return;
 
-    if (config.turbo && id.includes("hotwired_turbo-rails.js")) {
+
+    if (id.includes("turbo") && code.includes("window.Turbo =")) {
       const metaHotFooter = `
-        if (import.meta.hot) {
+        if (import.meta.hot && !import.meta.hot.data.turboRegistered) {
+          import.meta.hot.data.turboRegistered = true;
           import.meta.hot.on("turbo-refresh", (data) => {
-            console.log("Run <turbo-stream action=refresh> via vite-plugin-full-reload");
+            console.log("Run <turbo-stream action=refresh> via vite-plugin-turbo-reload");
             Turbo.renderStreamMessage('<turbo-stream action="refresh"></turbo-stream>');
           })
         }
@@ -72,19 +62,15 @@ export default (paths: string | string[], config: Config = {}): PluginOption => 
   },
 
   configureServer ({ watcher, ws, config: { logger } }: ViteDevServer) {
-    const { root = process.cwd(), log = true, always = true, delay = 0, turbo = false } = config
+    const { root = process.cwd(), log = true, delay = 0 } = config
 
     const files = normalizePaths(root, paths)
     const shouldReload = picomatch(files)
     const checkReload = (path: string) => {
       if (shouldReload(path)) {
-        if (turbo) {
-          setTimeout(() => ws.send({ type: 'custom', event: 'turbo-refresh'}), delay)
-        } else {
-          setTimeout(() => ws.send({ type: 'full-reload', path: always ? '*' : path }), delay)
-        }
+        setTimeout(() => ws.send({ type: 'custom', event: 'turbo-refresh'}), delay)
         if (log)
-          logger.info(`${colors.green('full reload')} ${colors.dim(relative(root, path))}`, { clear: true, timestamp: true })
+          logger.info(`${colors.green('turbo reload')} ${colors.dim(relative(root, path))}`, { clear: true, timestamp: true })
       }
     }
 
