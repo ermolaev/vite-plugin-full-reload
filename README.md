@@ -94,6 +94,18 @@ The following options can be provided:
   TurboReload('app/views/**/*', { delay: 100 })
   ```
 
+- <kbd>tailwindDirectivePath</kbd>
+
+  Path to file, that contains Tailwind directive - `@tailwind base` or `@import "tailwindcss"`
+
+  __Default:__ `false`
+
+  ```js
+  TurboReload('app/views/**/*', {
+    tailwindDirectivePath: "app/frontend/stylesheets/tailwind.scss"
+  })
+  ```
+
 ## License
 
 This library is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

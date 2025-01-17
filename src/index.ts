@@ -1,6 +1,7 @@
 import { relative, resolve } from 'path'
 import colors from 'picocolors'
 import picomatch from 'picomatch'
+import { utimes } from 'fs/promises'
 import { type PluginOption, type ViteDevServer, normalizePath } from 'vite'
 
 /**
@@ -24,6 +25,12 @@ export interface Config {
    * @default process.cwd()
    */
   root?: string
+
+  /**
+   * Path to file, that contains Tailwind directive - `@tailwind base` or `@import "tailwindcss"`;
+   * @default false
+   */
+  tailwindDirectivePath?: string
 }
 
 export function normalizePaths (root: string, path: string | string[]): string[] {
@@ -45,12 +52,19 @@ export default (paths: string | string[], config: Config = {}): PluginOption => 
     if ((options == null ? void 0 : options.ssr) && !process.env.VITEST)
       return;
 
-
     if (id.includes("turbo") && code.includes("window.Turbo =")) {
+      // disable Full Reload - https://github.com/vitejs/vite/issues/5763#issuecomment-1974235806
       const metaHotFooter = `
         if (import.meta.hot && !import.meta.hot.data.turboRegistered) {
           import.meta.hot.data.turboRegistered = true;
+          import.meta.hot.on("vite:beforeFullReload", (event) => {
+            if (import.meta.hot.data.disableFullReload) {
+              event.path = "(WORKAROUND).html";
+            };
+            import.meta.hot.data.disableFullReload = false;
+          });
           import.meta.hot.on("turbo-refresh", (data) => {
+            import.meta.hot.data.disableFullReload = true;
             console.log("Run <turbo-stream action=refresh> via vite-plugin-turbo-reload");
             Turbo.renderStreamMessage('<turbo-stream action="refresh"></turbo-stream>');
           })
@@ -62,12 +76,16 @@ export default (paths: string | string[], config: Config = {}): PluginOption => 
   },
 
   configureServer ({ watcher, ws, config: { logger } }: ViteDevServer) {
-    const { root = process.cwd(), log = true, delay = 0 } = config
+    const { root = process.cwd(), log = true, delay = 0, tailwindDirectivePath = false } = config
 
     const files = normalizePaths(root, paths)
     const shouldReload = picomatch(files)
     const checkReload = (path: string) => {
       if (shouldReload(path)) {
+        if (tailwindDirectivePath) {
+          const now = new Date();
+          utimes(normalizePaths(root, tailwindDirectivePath)[0], now, now)
+        }
         setTimeout(() => ws.send({ type: 'custom', event: 'turbo-refresh'}), delay)
         if (log)
           logger.info(`${colors.green('turbo reload')} ${colors.dim(relative(root, path))}`, { clear: true, timestamp: true })
