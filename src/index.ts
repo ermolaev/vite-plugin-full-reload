@@ -9,12 +9,6 @@ import { type PluginOption, type ViteDevServer, normalizePath } from 'vite'
  */
 export interface Config {
   /**
-   * How many milliseconds to wait before reloading the page after a file change.
-   * @default 0
-   */
-  delay?: number
-
-  /**
    * Whether to log when a file change triggers a full reload.
    * @default true
    */
@@ -76,17 +70,18 @@ export default (paths: string | string[], config: Config = {}): PluginOption => 
   },
 
   configureServer ({ watcher, ws, config: { logger } }: ViteDevServer) {
-    const { root = process.cwd(), log = true, delay = 0, tailwindDirectivePath = false } = config
+    const { root = process.cwd(), log = true, tailwindDirectivePath = false } = config
 
     const files = normalizePaths(root, paths)
     const shouldReload = picomatch(files)
     const checkReload = (path: string) => {
       if (shouldReload(path)) {
+        ws.send({ type: 'custom', event: 'turbo-refresh'})
+
         if (tailwindDirectivePath) {
           const now = new Date();
           utimes(normalizePaths(root, tailwindDirectivePath)[0], now, now)
         }
-        setTimeout(() => ws.send({ type: 'custom', event: 'turbo-refresh'}), delay)
         if (log)
           logger.info(`${colors.green('turbo reload')} ${colors.dim(relative(root, path))}`, { clear: true, timestamp: true })
       }

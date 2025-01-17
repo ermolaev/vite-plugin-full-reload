@@ -83,17 +83,6 @@ The following options can be provided:
   TurboReload('config/routes.rb', { root: __dirname }),
   ``` 
 
-- <kbd>delay</kbd>
-
-  How many milliseconds to wait before reloading the page after a file change.
-  It can be used to offset slow template compilation in Rails.
-
-  __Default:__ `0`
-  
-  ```js
-  TurboReload('app/views/**/*', { delay: 100 })
-  ```
-
 - <kbd>tailwindDirectivePath</kbd>
 
   Path to file, that contains Tailwind directive - `@tailwind base` or `@import "tailwindcss"`
