@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-turbo-reload",
   "description": "Reload the page when files are modified via Hotwire Turbo",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "license": "MIT",
   "author": "Ermolaev Andrey",
   "repository": {
