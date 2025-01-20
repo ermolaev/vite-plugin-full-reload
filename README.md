@@ -26,6 +26,8 @@ When using _[Vite Ruby]_, I wanted to see changes to server-rendered layouts and
 
 _[vite-plugin-turbo-reload]_ is a replacement for the _[vite-plugin-full-reload]_ plugin, offering smoother and faster DOM updates when using _[Hotwire Turbo]_.
 
+Also support HMR for Tailwind CSS.
+
 ## Installation 💿
 
 Install the package as a development dependency:
@@ -44,7 +46,10 @@ import TurboReload from 'vite-plugin-turbo-reload'
 
 export default defineConfig({
   plugins: [
-    TurboReload(['config/routes.rb', 'app/views/**/*', 'app/components/**/*'])
+    TurboReload(["app/components/**/*.slim", "app/views/**/*.slim"], {
+      // for Tailwind CSS
+      tailwindDirectivePath: "app/frontend/stylesheets/vendor/tailwind/tailwind.scss",
+    }),
   ],
 })
 ```
